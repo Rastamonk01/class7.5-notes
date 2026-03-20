@@ -171,4 +171,5 @@ For example mine:
 This script is super simple and unrealistic for production but hopefully it helps you understand what is happening. 
 
 The webpage of my script will look like this:
+
 ![](./assets/script-output.PNG)
