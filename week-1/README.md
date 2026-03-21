@@ -39,9 +39,9 @@ You will need a Gmail account, a debit/credit card and about 5 minutes (normally
 * **Compute Engine:** The GCP service for making servers.
 * **VM:** A virtual server (a server run on GCP's data center).
 * **Server:** A computer that does things for other computers or devices. Examples are web servers (they host websites), file servers (they host files), a media server (many of you may use something like Plex at home), and many other types as well. 
-* **IP Address:** The address to find a computer (such as a server). It is split into 4 "octets" such as 10.20.30.40 with the decimals. Each decimal number will be between 0–255 inclusive (it can be 0 or 255, such as 255.255.255.0). 
+* **IP Address:** The address to find a computer (such as a server). It is split into 4 "octets" such as 10.20.30.40 with 3 decimals. Each decimal number will be between 0–255 inclusive (it can be 0 or 255, such as 255.255.255.0). 
 * **HTTP:** Hypertext Transport Protocol, which is the protocol websites were built on. Typically not used today in favor of HTTPS but used widely for testing. It uses the protocol "TCP" to transfer data and traditionally uses port 80 (it doesn't have to; often 8080 and 5000 are used for example). 
-* **SSH:** Secure Shell protocol, which is a protocol that uses cryptographic keys to create a secure "tunnel" to another computer and allows you to access its shell and use the command line interface. 
+* **SSH:** Secure Shell protocol, which is a protocol that uses cryptographic keys to create a secure "tunnel" to another computer and allows you to access its shell and execute commands with your own (or GCP's pseduo-) command line interface.
 
 ## GCP Console
 
@@ -59,7 +59,7 @@ It is important to remember the console is highly uniform (GCP is a bit better a
 In the above screenshot you can see (ignore what's in red, that's either part of the welcome page itself or not needed for a while):
 * **A)** This is the navigation menu or typically just called the "hamburger menu." This is how we can move to different "services" (like Compute Engine or Cloud Storage) in GCP as we will see later in class. [This](./assets/hamburger.PNG) is the hamburger/navigation menu expanded fully.
     * *Note:* Mine will look slightly different. I have favorites. The top 4 will always be the same. 
-* **B)** This is the project selector. You should make sure this is set to the project you created when you set up the GCP account. I will go into more detail below. 
+* **B)** This is the project picker. You should make sure this is set to the project you created when you set up the GCP account. I will go into more detail below. 
 * **C)** These are your notifications. Successful deployments of various services, alerts, errors, and more will be available here. 
 * **D)** This is the settings menu. Payment methods, appearance of the console, documentation, and more can be accessed from this. 
 * **E)** This is the identity you are using for GCP. For everyone right now this is simply your Gmail account you used to make the GCP account. If you have multiple Gmails signed in sometimes it will switch it to another and you will get a permissions error. So be mindful that you are signed in with the correct Gmail account. 
@@ -88,7 +88,7 @@ If you refer back to the Console welcome page screenshot on letter **F**, you ca
 Services in GCP can be largely classified as Global, Regional, and Zonal. To define these terms we need to examine what the "cloud" really is and the actual infrastructure of GCP itself. 
 
 1. Everything we do using GCP exists physically in a data center. It is simply not our data center. We lease software, compute, storage, networking, and other resources from Google and it is packaged in a way we can effectively use it. 
-2. The GCP physical infrastructure exists physically in **zones**. Zones may or may not be geographically near each other but they have independent security, cooling, power, etc. 
+2. The GCP physical infrastructure exists physically in **Zones**. Zones may or may not be geographically near each other but they have independent security, cooling, power, etc. 
 3. Zones are grouped into **Regions**. Regions are comprised of at least 3 zones that are connected together so they can communicate very quickly. 
 4. All regions are grouped together and would be the **global infrastructure** of GCP. 
 
@@ -127,21 +127,23 @@ We will be using the Compute Engine today for the lab to create a VM. A **VM** i
 2. Go to the **Hamburger Menu**.
 3. Hover over **Compute Engine**.
 4. In the second menu, click on **VM Instances**. [Example here](./assets/gce-menu.PNG).
-5. If you get a message about your API not being enabled, simply enable it and wait a minute. 
+5. If you get a message about your API not being enabled, simply enable it and wait a minute. Also make sure to go back to the install document and finish setting up your GCP account if you haven't.
 6. Click on **Create Instance** in the upper left. [Example here](./assets/gce-create-instance.PNG).
 7. [This](./assets/create-instance-menu.PNG) is what you will see on the left.
 8. **Machine Configuration menu:**
     * **Name:** An easy identifier for your VM.
     * **Region and Zone:** Choose a zone (e.g., `us-central1-a`).
     * **Machine Type:** E2 is the cheapest and works perfectly. 
-9. **OS and storage:** Here we can change the Operating system (default is Debian Linux). 
+9. **OS and storage:** Here we can change the Operating system (default is Debian Linux). We can also change the storage (hard drive settings basically) for the VM. Nothing to change as the defaults are good.
 10. **Networking:** * Under firewall, check **Allow HTTP traffic**. [Example here](./assets/instance-network-settings.PNG). 
     * This allows `tcp:80` traffic to enter (ingress) so people can see your website. 
-11. **Advanced:** * Under **Automation**, fill in the **Startup script**. 
+11. **Advanced:** This isn't anything "advanced" it's the best name they could come up with for all the random settings. 
+    * Under **Automation**, fill in the **Startup script**. 
     * When using GitHub, make sure you use the **raw copy** button. 
-    * Simple script example [here](./scripts/simple-start-up.sh).
+    * Simple script example [here](./scripts/expanded-start-up.sh).
+    * This tells the VM during boot (right after) the instructions needed to make a web server. 
 12. Press the **Create** button. 
-13. Wait 1–5 minutes for the VM to boot and bootstrap.
+13. Wait 1–3 minutes for the VM to boot and bootstrap.
 14. Click on the **External IP** to test your website. [Example here](/assets/external-ip.png).
 
 ## Troubleshooting
@@ -151,22 +153,24 @@ We will be using the Compute Engine today for the lab to create a VM. A **VM** i
 * Try a different browser. 
 * Ensure `http://` (not `https://`) is used in the URL bar. 
 
+[This](./troubleshooting.md) is my troubleshooting notes...for prior students or guys with CLI knowledge you may like it. New students should skip. 
+
 
 ## Startup script overview
 
-The scripts can seem complex which is why I kept mine simple. Basically the big steps are:
+The scripts can seem complex which is why I kept mine simple. The fun startup scripts are essentially the same but with bells and whistles.  Basically the big steps are:
 1) If needed, download needed software onto the VM (like a webserver or packages for python)
-2) Make or download an HTML file 
+2) Make or download an HTML file (optionally CSS for style and Javascript for function)
 3) Use a web server to run a web server 
 
 Thats what the scripts at a very high overview. 
 
-For example mine:
-1) line 1 is simply telling the VM its a shell script to be ran with the bash shell. This is the program that understands what the script says. 
-2) I skip downloading packages using something like `apt` since my script doesnt have any "dependencies" (everything is already on the VM from the beginning). 
-3) line 4-6 I get some metadata (data about the VM server itself) and save it to variables (those are in caps).
-4) lines 9-18 I make a super simple html file for the webpage and put the metadata inside it. 
-5) line 21 I use python's built in web server module to run the web page. 
+For example [mine](./scripts/expanded-start-up.sh):
+1) line 1 is simply telling the VM that this list of directions is a "shell script" to be ran with the "bash shell". This is the program that understands what the script says. 
+2) line 4 I need a web server so I download one using a program called "apt" which is a package manager (automates setting up programs basically). I choose Nginx which is very popular. By default it starts automatically, restarts automatically and runs on tcp:80 (HTTP).
+3) line 7-9 I get some "metadata" (data about the VM server itself) and save it to variables (those are in caps).
+4) lines 13-22 I make a super simple html file for the webpage and put the metadata inside it. I use a utility called "cat" which is often used for opening/making text files. I save it to the folder that Nginx looks in by default. 
+
 
 This script is super simple and unrealistic for production but hopefully it helps you understand what is happening. 
 
