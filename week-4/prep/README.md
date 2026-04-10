@@ -468,7 +468,7 @@ No region or zone is specified in this resource block. When omitted, the Google 
 6. Check the GCP console to verify your VM exists.
 7. Run `terraform destroy` to tear it down, and confirm it is gone in the console.
 
-Note: when `terraform apply` runs for the first time it creates `terraform.tfstate`. Do not delete or manually edit this file. It is how Terraform tracks everything it manages. Also avoid making changes to Terraform-managed resources via the console or `gcloud`, as this introduces state drift -- a mismatch between the actual state of your account and what the state file believes is there. On subsequent applies or the first `terraform destroy`, Terraform also creates `terraform.tfstate.backup`, a copy of the state file from before that operation ran.
+Note: when `terraform apply` runs for the first time it creates `terraform.tfstate`. Do not delete or manually edit this file. It is how Terraform tracks everything it manages. Also avoid making changes to Terraform-managed resources via the console or `gcloud`, as this introduces state drift which is a mismatch between the actual state of your account and what the state file believes is there. On subsequent applies or the first `terraform destroy`, Terraform also creates `terraform.tfstate.backup`, a copy of the state file from before that operation ran.
 
 ---
 
