@@ -7,6 +7,9 @@ files=(
   "https://raw.githubusercontent.com/aaron-dm-mcdonald/class7.5-notes/refs/heads/main/.gitignore"
 )
 
-for url in "${files[@]}"; do
-  curl -O "$url"
+for i in "${!files[@]}"; do
+  echo "Downloading file $((i+1))..."
+  curl -Os "${files[$i]}"
 done
+
+echo "all done downloading, get to writing terraform!" 
